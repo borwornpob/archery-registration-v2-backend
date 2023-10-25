@@ -2,11 +2,13 @@ const express = require("express");
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const cors = require("cors");
 
 const app = express();
 const prisma = new PrismaClient();
 
 app.use(express.json());
+app.use(cors());
 
 const secret = "yoloooo";
 
@@ -18,7 +20,7 @@ app.post("/register", async (req, res) => {
         const user = await prisma.user.create({
             data: { telnumber, password: hashedPassword, name, surname },
         });
-        res.status(201).json({ user });
+        res.status(201).json({ user, error: null });
     } catch (error) {
         res.status(400).json({ error: "Telephone number already registered" });
     }
@@ -39,7 +41,7 @@ app.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign({ id: user.id }, secret);
-    res.json({ token });
+    res.json({ token, error: null });
 });
 
 const PORT = 3000;
